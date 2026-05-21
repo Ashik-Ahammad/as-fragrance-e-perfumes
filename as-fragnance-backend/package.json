@@ -1,0 +1,21 @@
+{
+  "name": "as-fragnance-backend",
+  "version": "1.0.0",
+  "description": "Backend of AS Fragrance done with EXPRESSJS MONGODB BETTERAUTH JWT ADMIN PANEL",
+  "keywords": [
+    "AS-FRAGNANCE"
+  ],
+  "license": "ISC",
+  "author": "AS-FRAGNANCE-DEVELOPER",
+  "type": "commonjs",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "cors": "^2.8.6",
+    "dotenv": "^17.4.2",
+    "express": "^5.2.1",
+    "mongodb": "^7.2.0"
+  }
+}
