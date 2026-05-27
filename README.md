@@ -2,11 +2,6 @@
 
 [![Live Preview](https://img.shields.io/badge/Live_Preview-View_Store-d97706?style=for-the-badge&logo=vercel&logoColor=white)](https://as-fragrance.vercel.app/)
 
-![alt text](image.png)
-![alt text](image-1.png)
-![alt text](image-2.png)
-
-
 Welcome to the repository for **A S Fragrance**, a modern, high-performance, and visually captivating e-commerce platform dedicated to luxury perfumes. Built with the latest web technologies, this project perfectly balances an elegant user experience with a powerful, secure, and intuitive admin management system.
 
 ---
