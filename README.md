@@ -106,3 +106,6 @@ Below is a reference table for the primary REST API endpoints utilized in this a
 | `/newsletter` | `POST` | Subscribes a user's email to the marketing newsletter | Public |
 
 ---
+
+<img width="1896" height="904" alt="image" src="https://github.com/user-attachments/assets/edc499c0-46a6-40cc-b46b-3308fd3f8a5d" />
+
