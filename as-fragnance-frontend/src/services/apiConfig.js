@@ -10,6 +10,8 @@ const API_BASE_URL = process.env.NEXT_PUBLIC_SERVER_URL || "http://localhost:888
  * @param {object} options Fetch options (method, body, headers)
  * @returns {Promise<any>}
  */
+let cachedToken = null;
+
 const apiFetch = async (endpoint, options = {}) => {
   const url = `${API_BASE_URL}${endpoint}`;
   
@@ -18,8 +20,6 @@ const apiFetch = async (endpoint, options = {}) => {
     ...options.headers,
   };
 
-let cachedToken = null;
-
   // Automatically attach auth token if available
   if (typeof window !== "undefined") {
     let token = localStorage.getItem("token") || cachedToken;
@@ -27,7 +27,7 @@ let cachedToken = null;
     if (!token) {
       try {
         // Fetch the HTTP-only cookie token from our Next.js API
-        const tokenRes = await fetch("/api/get-token");
+        const tokenRes = await fetch("/api/get-token", { credentials: "include" });
         const tokenData = await tokenRes.json();
         if (tokenData.token) {
           token = tokenData.token;
