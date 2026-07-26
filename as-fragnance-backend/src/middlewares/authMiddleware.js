@@ -30,9 +30,10 @@ const verifyToken = async (req, res, next) => {
     req.tokenPayload = payload;
     next();
   } catch (error) {
-    // Fallback: Check if it's an opaque database session token
+    // Fallback: Check if it's an opaque database session token (which may be a signed cookie)
+    const rawToken = token.split(".")[0];
     const db = getDB();
-    const session = await db.collection("session").findOne({ token });
+    const session = await db.collection("session").findOne({ token: rawToken });
     
     if (session && session.userId) {
       req.tokenPayload = { sub: session.userId };
@@ -90,10 +91,11 @@ const verifyAdmin = async (req, res, next) => {
 
     next();
   } catch (error) {
-    // Fallback: Check if it's an opaque database session token
+    // Fallback: Check if it's an opaque database session token (which may be a signed cookie)
     try {
+      const rawToken = token.split(".")[0];
       const db = getDB();
-      const session = await db.collection("session").findOne({ token });
+      const session = await db.collection("session").findOne({ token: rawToken });
       
       if (session && session.userId) {
         const dbUser = await db.collection("user").findOne({ _id: session.userId });
