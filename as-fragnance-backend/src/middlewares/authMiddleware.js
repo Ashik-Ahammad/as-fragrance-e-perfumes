@@ -56,14 +56,24 @@ const verifyAdmin = async (req, res, next) => {
     const { payload } = await jwtVerify(token, JWKS);
     req.tokenPayload = payload;
 
-    const email = payload?.email || payload?.sub;
-    if (!email)
-      return res.status(403).json({ message: "Forbidden - No email in token" });
+    const { ObjectId } = require("mongodb");
+    
+    const query = [];
+    if (payload?.email) query.push({ email: payload.email });
+    if (payload?.sub) {
+      query.push({ id: payload.sub });
+      try {
+        query.push({ _id: new ObjectId(payload.sub) });
+      } catch (e) {}
+    }
+
+    if (query.length === 0)
+      return res.status(403).json({ message: "Forbidden - No identity in token" });
 
     // Fetch user from DB to check if they have admin role
     const db = getDB();
     const userCollection = db.collection("user");
-    const dbUser = await userCollection.findOne({ email });
+    const dbUser = await userCollection.findOne({ $or: query });
 
     if (dbUser?.role !== "admin") {
       return res.status(403).json({ message: "Forbidden - Admin only" });

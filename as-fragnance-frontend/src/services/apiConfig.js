@@ -18,9 +18,26 @@ const apiFetch = async (endpoint, options = {}) => {
     ...options.headers,
   };
 
-  // Automatically attach auth token if available in localStorage
+let cachedToken = null;
+
+  // Automatically attach auth token if available
   if (typeof window !== "undefined") {
-    const token = localStorage.getItem("token");
+    let token = localStorage.getItem("token") || cachedToken;
+    
+    if (!token) {
+      try {
+        // Fetch the HTTP-only cookie token from our Next.js API
+        const tokenRes = await fetch("/api/get-token");
+        const tokenData = await tokenRes.json();
+        if (tokenData.token) {
+          token = tokenData.token;
+          cachedToken = token; // Cache in memory to prevent repeated calls
+        }
+      } catch (err) {
+        console.error("Failed to fetch internal token", err);
+      }
+    }
+
     if (token && !headers["Authorization"]) {
       headers["Authorization"] = `Bearer ${token}`;
     }

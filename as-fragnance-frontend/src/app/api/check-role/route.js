@@ -15,7 +15,7 @@ export async function GET(request) {
     }
 
     const backendRes = await fetch(
-      `${process.env.NEXT_PUBLIC_SERVER_URL}/user-role?email=${encodeURIComponent(email)}`,
+      `${process.env.NEXT_PUBLIC_SERVER_URL}/users/role?email=${encodeURIComponent(email)}`,
       {
         headers: {
           "x-internal-key":
