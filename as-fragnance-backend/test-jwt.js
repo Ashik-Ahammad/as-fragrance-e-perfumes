@@ -1,0 +1,1 @@
+const { createRemoteJWKSet, jwtVerify } = require('jose-cjs'); const token = process.argv[2]; const JWKS = createRemoteJWKSet(new URL('http://localhost:3000/api/auth/jwks')); jwtVerify(token, JWKS).then(r =, r.payload)).catch(e =, e.message)); 

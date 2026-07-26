@@ -16,5 +16,9 @@ export async function GET() {
     }
   }
 
+  try {
+    require("fs").writeFileSync("token-debug.txt", token || "no-token");
+  } catch (e) {}
+
   return NextResponse.json({ token, debug: allCookies.map(c => c.name) });
 }

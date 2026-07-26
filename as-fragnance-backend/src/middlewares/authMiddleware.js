@@ -30,6 +30,15 @@ const verifyToken = async (req, res, next) => {
     req.tokenPayload = payload;
     next();
   } catch (error) {
+    // Fallback: Check if it's an opaque database session token
+    const db = getDB();
+    const session = await db.collection("session").findOne({ token });
+    
+    if (session && session.userId) {
+      req.tokenPayload = { sub: session.userId };
+      return next();
+    }
+
     return res
       .status(403)
       .json({ message: "Forbidden - Token expired or invalid" });
@@ -81,6 +90,24 @@ const verifyAdmin = async (req, res, next) => {
 
     next();
   } catch (error) {
+    // Fallback: Check if it's an opaque database session token
+    try {
+      const db = getDB();
+      const session = await db.collection("session").findOne({ token });
+      
+      if (session && session.userId) {
+        const dbUser = await db.collection("user").findOne({ _id: session.userId });
+        if (dbUser?.role === "admin") {
+          req.tokenPayload = { sub: session.userId, email: dbUser.email };
+          return next();
+        } else {
+          return res.status(403).json({ message: "Forbidden - Admin only" });
+        }
+      }
+    } catch (fallbackError) {
+      console.error("Session fallback error:", fallbackError);
+    }
+
     return res
       .status(403)
       .json({ message: "Forbidden - Token expired or invalid" });
