@@ -1,5 +1,5 @@
 import React from "react";
-import AddPerfumesClient from "@/components/client-components/AddPerfumesClient";
+import AddPerfumesClient from "./AddPerfumesClient";
 
 export const metadata = {
   title: "Entry New Fragrance | AS Fragrance Admin",

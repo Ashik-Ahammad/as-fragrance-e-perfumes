@@ -1,10 +1,10 @@
 import { Roboto } from "next/font/google";
 import "./globals.css";
-import Navbar from "@/components/Navbar";
-import Footer from "@/components/Footer";
+import Navbar from "@/components/layout/Navbar";
+import Footer from "@/components/layout/Footer";
+import CartSidebar from "@/app/cart/CartSidebar";
+import WhatsAppWidget from "@/components/layout/WhatsAppWidget";
 import { Toaster } from "sonner";
-import CartSidebar from "@/components/client-components/CartSidebar";
-import WhatsAppWidget from "@/components/WhatsAppWidget";
 
 const roboto = Roboto({
   weight: ["100", "300", "400", "500", "700", "900"],

@@ -1,5 +1,5 @@
 import React from "react";
-import ProfileClient from "@/components/client-components/ProfileClient";
+import ProfileClient from "./ProfileClient";
 
 export const metadata = {
   title: "My Account | AS Fragrance",

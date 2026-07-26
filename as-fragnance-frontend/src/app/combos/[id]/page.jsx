@@ -1,5 +1,5 @@
 import React from "react";
-import ComboDetailClient from "@/components/ComboDetailClient";
+import ComboDetailClient from "./ComboDetailClient";
 
 export async function generateMetadata({ params }) {
   const { id } = await params;

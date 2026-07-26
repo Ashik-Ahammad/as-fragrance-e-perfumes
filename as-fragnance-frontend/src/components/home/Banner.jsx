@@ -4,12 +4,12 @@ import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { Swiper, SwiperSlide } from "swiper/react";
-import { Autoplay, EffectFade, Pagination, Navigation } from "swiper/modules";
+import { Autoplay, EffectFade, Pagination } from "swiper/modules";
 import { motion } from "framer-motion";
 import "swiper/css";
 import "swiper/css/effect-fade";
 import "swiper/css/pagination";
-import "swiper/css/navigation";
+import "swiper/css/pagination";
 
 export default function Banner() {
   const [slides, setSlides] = useState([]);
@@ -48,21 +48,20 @@ export default function Banner() {
 
   if (slides.length === 0) {
     return (
-      <div className="relative w-full h-screen lg:h-[calc(100vh-76px)] bg-zinc-900 flex items-center justify-center">
+      <div className="relative w-full h-screen lg:h-screen bg-zinc-900 flex items-center justify-center">
         <p className="text-white/40 text-sm">No banners configured.</p>
       </div>
     );
   }
 
   return (
-    <div className="relative w-full h-screen lg:h-[calc(100vh-76px)] bg-zinc-900">
+    <div className="relative w-full h-screen lg:h-screen bg-zinc-900">
       <Swiper
-        modules={[Autoplay, EffectFade, Pagination, Navigation]}
+        modules={[Autoplay, EffectFade, Pagination]}
         effect="fade"
         speed={1000}
         autoplay={{ delay: 5000, disableOnInteraction: false }}
         pagination={{ clickable: true, dynamicBullets: true }}
-        navigation={true}
         loop={slides.length > 1}
         className="w-full h-full mySwiper"
       >
@@ -141,22 +140,6 @@ export default function Banner() {
         .swiper-pagination-bullet-active {
           background-color: #f59e0b !important;
           transform: scale(1.2);
-        }
-        .swiper-button-next,
-        .swiper-button-prev {
-          color: rgba(255, 255, 255, 0.6) !important;
-          transition: all 0.3s ease;
-        }
-        .swiper-button-next:hover,
-        .swiper-button-prev:hover {
-          color: white !important;
-          transform: scale(1.1);
-        }
-        @media (max-width: 768px) {
-          .swiper-button-next,
-          .swiper-button-prev {
-            display: none !important;
-          }
         }
       `}</style>
     </div>

@@ -1,5 +1,5 @@
 import React from "react";
-import PerfumeDetailClient from "@/components/PerfumeDetailClient";
+import PerfumeDetailClient from "./PerfumeDetailClient";
 
 export async function generateMetadata({ params }) {
   const { id } = await params;

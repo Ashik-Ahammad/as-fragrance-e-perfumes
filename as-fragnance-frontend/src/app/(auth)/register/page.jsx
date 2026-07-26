@@ -26,9 +26,13 @@ import { BsGoogle } from "react-icons/bs";
 import { authClient } from "@/lib/auth-client";
 import { redirect } from "next/navigation";
 import { toast } from "sonner";
+import { uploadImageToImgBB } from "@/utils/imgbbUpload";
 
 const SignUpPage = () => {
   const [showPassword, setShowPassword] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
+  const [imageFile, setImageFile] = useState(null);
+  const [imagePreview, setImagePreview] = useState(null);
 
   const validatePassword = (password) => {
     const passwordRegex =
@@ -56,26 +60,35 @@ const SignUpPage = () => {
       toast.error(
         "Password must contain uppercase, lowercase, number, special character and minimum 6 characters."
       );
-
       return;
     }
 
-    const { data, error } = await authClient.signUp.email({
-      email: user.email,
+    setIsUploading(true);
+    let uploadedImageUrl = "";
 
-      password: user.password,
+    try {
+      if (imageFile) {
+        uploadedImageUrl = await uploadImageToImgBB(imageFile);
+      }
 
-      name: user.fullName,
+      const { data, error } = await authClient.signUp.email({
+        email: user.email,
+        password: user.password,
+        name: user.fullName,
+        image: uploadedImageUrl,
+      });
 
-      image: user.imageUrl,
-    });
+      if (data) {
+        redirect("/");
+      }
 
-    if (data) {
-      redirect("/");
-    }
-
-    if (error) {
-      toast.error(error.message);
+      if (error) {
+        toast.error(error.message);
+      }
+    } catch (error) {
+      toast.error("An error occurred during registration.");
+    } finally {
+      setIsUploading(false);
     }
   };
 
@@ -205,22 +218,35 @@ const SignUpPage = () => {
                 variants={itemVariants}
                 className="group transition-all duration-300 w-full"
               >
-                <TextField type="url" className="w-full">
+                <div className="w-full">
                   <Label className="flex items-center gap-2 text-xs font-semibold tracking-widest uppercase text-stone-500 mb-2 group-focus-within:text-amber-600 transition-colors">
                     <FiImage className="text-stone-400" />
-                    Profile Image URL
+                    Profile Image (Optional)
                   </Label>
 
-                  <Input
-                    name="imageUrl"
-                    type="url"
-                    placeholder="https://example.com/photo.jpg"
-                    className="w-full"
-                    classNames={inputClassNames}
-                  />
-
-                  <FieldError className="text-[10px] text-rose-500 mt-1" />
-                </TextField>
+                  <div className="flex items-center gap-3">
+                    {imagePreview && (
+                      <div className="w-11 h-11 rounded-full overflow-hidden border border-stone-200 shrink-0 shadow-sm">
+                        <img src={imagePreview} alt="Preview" className="w-full h-full object-cover" />
+                      </div>
+                    )}
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={(e) => {
+                        const file = e.target.files[0];
+                        if (file) {
+                          setImageFile(file);
+                          setImagePreview(URL.createObjectURL(file));
+                        } else {
+                          setImageFile(null);
+                          setImagePreview(null);
+                        }
+                      }}
+                      className="block w-full text-sm text-stone-500 file:mr-4 file:py-2.5 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-white/60 file:border file:border-stone-200 file:text-stone-700 hover:file:bg-amber-50 hover:file:text-amber-700 hover:file:border-amber-200 cursor-pointer transition-all h-11"
+                    />
+                  </div>
+                </div>
               </motion.div>
 
               <motion.div
@@ -271,10 +297,12 @@ const SignUpPage = () => {
               <motion.div variants={itemVariants} className="pt-2 w-full">
                 <Button
                   type="submit"
+                  disabled={isUploading}
+                  isLoading={isUploading}
                   className="w-full h-11 bg-amber-600 hover:bg-amber-500 text-white font-semibold tracking-widest uppercase text-xs rounded-xl transition-all duration-300 shadow-md shadow-amber-600/10"
-                  endContent={<FiUserPlus className="text-sm" />}
+                  endContent={!isUploading && <FiUserPlus className="text-sm" />}
                 >
-                  Create Account
+                  {isUploading ? "Uploading & Creating..." : "Create Account"}
                 </Button>
               </motion.div>
             </Form>

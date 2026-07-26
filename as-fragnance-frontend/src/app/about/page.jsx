@@ -1,5 +1,5 @@
 import React from "react";
-import AboutClient from "@/components/client-components/AboutClient";
+import AboutClient from "./AboutClient";
 
 export const metadata = {
   title: "About Our Legacy | AS Fragrance",

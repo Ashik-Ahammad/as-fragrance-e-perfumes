@@ -1,5 +1,5 @@
 import React from "react";
-import CartClient from "@/components/client-components/CartClient";
+import CartClient from "./CartClient";
 
 export const metadata = {
   title: "Checkout Your Cart | AS Fragrance",

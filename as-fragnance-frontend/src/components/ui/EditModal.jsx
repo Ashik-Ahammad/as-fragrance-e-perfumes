@@ -4,6 +4,7 @@ import { FiEdit3, FiPlus, FiTrash2, FiSave, FiX } from "react-icons/fi";
 import { FaBangladeshiTakaSign } from "react-icons/fa6";
 import { toast } from "sonner";
 import { authClient } from "@/lib/auth-client";
+import { uploadImageToImgBB } from "@/utils/imgbbUpload";
 
 export function EditModal({ perfume, onSuccess }) {
   const [open, setOpen] = useState(false);
@@ -20,6 +21,8 @@ export function EditModal({ perfume, onSuccess }) {
     description: perfume?.description || "",
   });
   const [features, setFeatures] = useState(perfume?.features || []);
+  const [imageFile, setImageFile] = useState(null);
+  const [imagePreview, setImagePreview] = useState(perfume?.imageUrl || null);
 
   const categorySuggestions = [
     "Musk",
@@ -51,6 +54,8 @@ export function EditModal({ perfume, onSuccess }) {
       description: perfume?.description || "",
     });
     setFeatures(perfume?.features || []);
+    setImageFile(null);
+    setImagePreview(perfume?.imageUrl || null);
     setOpen(true);
   };
 
@@ -84,7 +89,13 @@ export function EditModal({ perfume, onSuccess }) {
         return;
       }
 
-      const payload = { ...form, features };
+      let finalImageUrl = form.imageUrl;
+      if (imageFile) {
+        toast.loading("Uploading new image...", { id: loadingToast });
+        finalImageUrl = await uploadImageToImgBB(imageFile);
+      }
+
+      const payload = { ...form, imageUrl: finalImageUrl, features };
 
       const res = await fetch(
         `${process.env.NEXT_PUBLIC_SERVER_URL}/perfume/${perfume?._id}`,
@@ -209,17 +220,30 @@ export function EditModal({ perfume, onSuccess }) {
                     }
                   />
                 </div>
-                <div>
-                  <label className={lbl}>Image URL</label>
-                  <input
-                    type="url"
-                    className={inp}
-                    placeholder="https://..."
-                    value={form.imageUrl}
-                    onChange={(e) =>
-                      setForm({ ...form, imageUrl: e.target.value })
-                    }
-                  />
+                <div className="flex flex-col">
+                  <label className={lbl}>Image File</label>
+                  <div className="flex items-center gap-3">
+                    {(imagePreview || form.imageUrl) && (
+                      <div className="w-[42px] h-[42px] rounded-xl overflow-hidden border border-stone-200 shrink-0 shadow-sm bg-white">
+                        <img src={imagePreview || form.imageUrl} alt="Preview" className="w-full h-full object-cover" />
+                      </div>
+                    )}
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={(e) => {
+                        const file = e.target.files[0];
+                        if (file) {
+                          setImageFile(file);
+                          setImagePreview(URL.createObjectURL(file));
+                        } else {
+                          setImageFile(null);
+                          setImagePreview(form.imageUrl || null);
+                        }
+                      }}
+                      className="block w-full text-sm text-stone-500 file:mr-3 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-[10px] file:uppercase file:tracking-wider file:font-bold file:bg-white file:border file:border-stone-200 file:text-stone-700 hover:file:bg-amber-50 hover:file:text-amber-700 hover:file:border-amber-200 cursor-pointer transition-all h-[42px] pt-1"
+                    />
+                  </div>
                 </div>
               </div>
 

@@ -1,5 +1,6 @@
 "use client";
 import React, { useState } from "react";
+import { uploadImageToImgBB } from "@/utils/imgbbUpload";
 import {
   Modal,
   Button,
@@ -35,11 +36,17 @@ export function AddPerfumeModal({ onSuccess }) {
 
   const [category, setCategory] = useState("Musk");
   const [stock, setStock] = useState("InStock");
+  const [imageFile, setImageFile] = useState(null);
+  const [imagePreview, setImagePreview] = useState(null);
 
   const onSubmit = async (e) => {
     e.preventDefault();
     const loadingToast = toast.loading("Adding new fragrance...");
     const formData = new FormData(e.currentTarget);
+    
+    // Remove the file object from formData if it exists to avoid polluting JSON
+    formData.delete("imageFile");
+    
     const newPerfume = Object.fromEntries(formData.entries());
 
     newPerfume.category = category;
@@ -47,6 +54,15 @@ export function AddPerfumeModal({ onSuccess }) {
     newPerfume.features = [];
 
     try {
+      let uploadedImageUrl = "";
+      if (imageFile) {
+        toast.loading("Uploading image...", { id: loadingToast });
+        uploadedImageUrl = await uploadImageToImgBB(imageFile);
+      }
+      
+      newPerfume.imageUrl = uploadedImageUrl;
+
+      toast.loading("Saving to database...", { id: loadingToast });
       const res = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/perfume`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -55,6 +71,9 @@ export function AddPerfumeModal({ onSuccess }) {
 
       if (res.ok) {
         toast.success("Fragrance added successfully! ✨", { id: loadingToast });
+        // Reset state
+        setImageFile(null);
+        setImagePreview(null);
         if (onSuccess) onSuccess();
       } else throw new Error("Failed");
     } catch (error) {
@@ -109,16 +128,34 @@ export function AddPerfumeModal({ onSuccess }) {
                     </Label>
                     <Input className={inputClass} placeholder="e.g. 1500" />
                   </TextField>
-                  <TextField
-                    name="imageUrl"
-                    type="url"
-                    className="flex flex-col w-full"
-                  >
+                  <div className="flex flex-col w-full">
                     <Label className={labelClass}>
-                      <FiImage /> Image URL
+                      <FiImage /> Image File
                     </Label>
-                    <Input className={inputClass} placeholder="https://..." />
-                  </TextField>
+                    <div className="flex items-center gap-3">
+                      {imagePreview && (
+                        <div className="w-[50px] h-[50px] rounded-xl overflow-hidden border border-stone-200 shrink-0 shadow-sm">
+                          <img src={imagePreview} alt="Preview" className="w-full h-full object-cover" />
+                        </div>
+                      )}
+                      <input
+                        type="file"
+                        accept="image/*"
+                        name="imageFile"
+                        onChange={(e) => {
+                          const file = e.target.files[0];
+                          if (file) {
+                            setImageFile(file);
+                            setImagePreview(URL.createObjectURL(file));
+                          } else {
+                            setImageFile(null);
+                            setImagePreview(null);
+                          }
+                        }}
+                        className="block w-full text-sm text-stone-500 file:mr-3 file:py-3 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-stone-50 file:border file:border-stone-200 file:text-stone-700 hover:file:bg-amber-50 hover:file:text-amber-700 hover:file:border-amber-200 cursor-pointer transition-all"
+                      />
+                    </div>
+                  </div>
                 </div>
 
                 <div className="grid grid-cols-2 gap-4">

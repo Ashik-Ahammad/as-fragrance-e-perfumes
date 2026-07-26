@@ -1,5 +1,5 @@
 import React from "react";
-import ContactClient from "@/components/client-components/ContactClient";
+import ContactClient from "./ContactClient";
 
 export const metadata = {
   title: "Contact Us | AS Fragrance",

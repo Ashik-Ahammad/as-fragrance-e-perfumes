@@ -1,5 +1,8 @@
-import PerfumeCard from "@/components/PerfumeCard";
-import PerfumeSearchFilter from "@/components/PerfumeSearchFilter";
+import dynamic from "next/dynamic";
+const PerfumeCard = dynamic(() => import("@/components/perfume/PerfumeCard"), { ssr: true });
+const PerfumeSearchFilter = dynamic(() => import("@/components/perfume/PerfumeSearchFilter"), { ssr: true });
+import Pagination from "@/components/perfume/Pagination";
+import AnimatedGrid from "@/components/perfume/AnimatedGrid";
 import React from "react";
 
 export const metadata = {
@@ -24,9 +27,23 @@ const ShopPage = async ({ searchParams }) => {
   const params = await searchParams;
   const search = params?.search || "";
   const category = params?.category || "All";
+  const minPrice = params?.minPrice || "";
+  const maxPrice = params?.maxPrice || "";
+  const stock = params?.stock || "All";
+  const page = params?.page || "1";
+
+  // Build the query string dynamically to handle optional params
+  const queryParams = new URLSearchParams();
+  if (search) queryParams.append("search", search);
+  if (category && category !== "All") queryParams.append("category", category);
+  if (minPrice) queryParams.append("minPrice", minPrice);
+  if (maxPrice) queryParams.append("maxPrice", maxPrice);
+  if (stock && stock !== "All") queryParams.append("stock", stock);
+  queryParams.append("page", page);
+  queryParams.append("limit", "9");
 
   const res = await fetch(
-    `${process.env.NEXT_PUBLIC_SERVER_URL}/perfume?search=${encodeURIComponent(search)}&category=${encodeURIComponent(category)}`,
+    `${process.env.NEXT_PUBLIC_SERVER_URL}/perfume?${queryParams.toString()}`,
     {
       next: {
         revalidate: 300,
@@ -34,7 +51,10 @@ const ShopPage = async ({ searchParams }) => {
     },
   );
 
-  const perfumes = await res.json();
+  const data = await res.json();
+  const perfumes = data.perfumes || data;
+  const totalPages = data.totalPages || 1;
+  const currentPage = data.currentPage || 1;
 
   return (
     <div className="bg-white min-h-screen text-zinc-600 pt-28 pb-20 font-sans overflow-hidden">
@@ -66,13 +86,17 @@ const ShopPage = async ({ searchParams }) => {
 
         <div className="w-full">
           {perfumes.length > 0 ? (
-            <div className="w-full grid lg:grid-cols-3 md:grid-cols-2 sm:grid-cols-1 gap-4">
-              {perfumes.map((perfume) => (
-                <PerfumeCard key={perfume._id} perfume={perfume}>
-                  {perfume.perfumeTitle}
-                </PerfumeCard>
-              ))}
-            </div>
+            <>
+              <AnimatedGrid key={queryParams.toString()}>
+                {perfumes.map((perfume) => (
+                  <PerfumeCard key={perfume._id} perfume={perfume}>
+                    {perfume.perfumeTitle}
+                  </PerfumeCard>
+                ))}
+              </AnimatedGrid>
+              
+              <Pagination totalPages={totalPages} currentPage={currentPage} />
+            </>
           ) : (
             <div className="text-center py-20 border border-dashed border-zinc-300 rounded-3xl">
               <h3 className="text-2xl font-semibold text-zinc-800 mb-3">

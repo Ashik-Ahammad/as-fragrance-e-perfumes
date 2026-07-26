@@ -1,6 +1,6 @@
 export const dynamic = 'force-dynamic';
 import React from "react";
-import AdminDashboardClient from "@/components/client-components/AdminDashboardClient";
+import AdminDashboardClient from "./AdminDashboardClient";
 
 export const metadata = {
   title: "Admin Terminal | AS Fragrance",

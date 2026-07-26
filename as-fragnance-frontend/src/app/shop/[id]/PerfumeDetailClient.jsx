@@ -20,7 +20,7 @@ import {
   FiUser,
 } from "react-icons/fi";
 import { FaStar, FaRegStar } from "react-icons/fa";
-import PurchaseOptions from "@/components/PurchaseOptions";
+import PurchaseOptions from "@/components/perfume/PurchaseOptions";
 
 const PerfumeDetailClient = ({ perfume }) => {
   const [isMounted, setIsMounted] = useState(false);
